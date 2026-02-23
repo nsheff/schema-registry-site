@@ -17,7 +17,7 @@ export function Home() {
     });
   }, []);
 
-  const apiRoot = window.location.origin + API_BASE;
+  const apiRoot = API_BASE.startsWith('http') ? API_BASE : window.location.origin + API_BASE;
 
   return (
     <div>
@@ -38,8 +38,8 @@ export function Home() {
         </p>
         <p className="api-callout-url">
           <strong>API endpoint:</strong>{' '}
-          <a href={`${API_BASE}/namespaces/index.json`} target="_blank" rel="noopener noreferrer">
-            <code>{apiRoot}/</code>
+          <a href={`${API_BASE}/service-info`} target="_blank" rel="noopener noreferrer">
+            <code>{apiRoot}/service-info</code>
           </a>
         </p>
       </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getVersions, API_BASE, type SchemaVersion } from '../api';
 import { StatusBadge } from '../components/Badge';
+import { ApiUrlBox } from '../components/ApiUrlBox';
 
 export function Schema() {
   const { namespace, schema } = useParams<{ namespace: string; schema: string }>();
@@ -20,12 +21,7 @@ export function Schema() {
       <h1>{schema}</h1>
       <p className="subtitle">Available versions.</p>
 
-      <div className="api-links">
-        <span className="api-links-label">API:</span>
-        <a href={versionsApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
-          Versions JSON
-        </a>
-      </div>
+      <ApiUrlBox rows={[{ label: 'Versions', url: versionsApiUrl }]} />
 
       <table className="data-table">
         <thead>

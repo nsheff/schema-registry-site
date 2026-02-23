@@ -4,6 +4,7 @@ import { getComponent, API_BASE } from '../api';
 import { SchemaViewer } from '../components/SchemaViewer';
 import { MaturityBadge } from '../components/Badge';
 import { RefLink } from '../components/RefLink';
+import { ApiUrlBox } from '../components/ApiUrlBox';
 
 interface PropertyInfo {
   name: string;
@@ -84,15 +85,12 @@ export function Component() {
         {maturity && <MaturityBadge level={maturity} />}
       </div>
 
-      {data.$id ? <p className="schema-id"><code>{String(data.$id)}</code></p> : null}
       {data.description ? <p>{String(data.description)}</p> : null}
 
-      <div className="api-links">
-        <span className="api-links-label">API:</span>
-        <a href={componentApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
-          Component JSON
-        </a>
-      </div>
+      <ApiUrlBox rows={[
+        ...(data.$id ? [{ label: 'Schema ID', url: String(data.$id) }] : []),
+        { label: 'API', url: componentApiUrl },
+      ]} />
 
       <div className="tab-bar">
         <button

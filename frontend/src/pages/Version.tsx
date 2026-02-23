@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getComponents, getSchema, API_BASE, type ComponentRecord } from '../api';
 import { SchemaViewer } from '../components/SchemaViewer';
+import { ApiUrlBox } from '../components/ApiUrlBox';
 
 export function Version() {
   const { namespace, schema, version } = useParams<{
@@ -36,15 +37,10 @@ export function Version() {
         {schema} <span className="version-tag">{version}</span>
       </h1>
 
-      <div className="api-links">
-        <span className="api-links-label">API:</span>
-        <a href={bundleApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
-          Bundle JSON
-        </a>
-        <a href={componentsApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
-          Components list
-        </a>
-      </div>
+      <ApiUrlBox rows={[
+        { label: 'Bundle', url: bundleApiUrl },
+        { label: 'Components', url: componentsApiUrl },
+      ]} />
 
       <div className="tab-bar">
         <button
@@ -70,28 +66,38 @@ export function Version() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-          <div className="component-list">
-            {filtered.map((c) => (
-              <div key={c.component_name} className="component-row">
-                <Link
-                  to={`/${namespace}/${schema}/${version}/${c.component_name}`}
-                  className="component-name"
-                >
-                  <strong>{c.component_name}</strong>
-                </Link>
-                <span className="muted component-desc">{c.description}</span>
-                <a
-                  href={`${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${c.component_name}.json`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="api-link-small"
-                  title="View raw JSON via API"
-                >
-                  JSON
-                </a>
-              </div>
-            ))}
-          </div>
+          <table className="component-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Description</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((c) => (
+                <tr key={c.component_name}>
+                  <td className="component-table-name">
+                    <Link to={`/${namespace}/${schema}/${version}/${c.component_name}`}>
+                      {c.component_name}
+                    </Link>
+                  </td>
+                  <td className="component-table-desc">{c.description}</td>
+                  <td>
+                    <a
+                      href={`${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${c.component_name}.json`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="api-link-small"
+                      title="View raw JSON via API"
+                    >
+                      JSON
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getSchemas, API_BASE, type SchemaRecord } from '../api';
 import { MaturityBadge } from '../components/Badge';
+import { ApiUrlBox } from '../components/ApiUrlBox';
 
 export function Namespace() {
   const { namespace } = useParams<{ namespace: string }>();
@@ -20,12 +21,7 @@ export function Namespace() {
       <h1>{namespace}</h1>
       <p className="subtitle">Schemas in this namespace.</p>
 
-      <div className="api-links">
-        <span className="api-links-label">API:</span>
-        <a href={schemasApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
-          Schemas JSON
-        </a>
-      </div>
+      <ApiUrlBox rows={[{ label: 'Schemas', url: schemasApiUrl }]} />
 
       <div className="card-grid">
         {schemas.map((s) => (

@@ -41,6 +41,27 @@ def build_all():
         },
     )
 
+    # Write service-info (GA4GH Service Info 1.0)
+    write_json(
+        os.path.join(API_DIR, "service-info"),
+        {
+            "id": "org.ga4gh.schema-registry.nsheff",
+            "name": "GKS Schema Registry",
+            "type": {
+                "group": "org.ga4gh",
+                "artifact": "schema-registry",
+                "version": "1.0.0",
+            },
+            "description": "A static GA4GH Schema Registry serving GKS and FAIRtracks JSON Schemas.",
+            "organization": {
+                "name": "GA4GH / nsheff",
+                "url": "https://github.com/nsheff/schema-registry-site",
+            },
+            "version": "1.0.0",
+            "environment": "production",
+        },
+    )
+
     # Write manifest
     manifest_paths = []
     for root, dirs, files in os.walk(API_DIR):

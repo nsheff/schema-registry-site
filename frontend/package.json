@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "local": "VITE_API_URL=https://nsheff.github.io/schema-registry-site/api vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

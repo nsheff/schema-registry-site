@@ -311,32 +311,35 @@ h1 {
   text-decoration: none;
 }
 
-/* Component list */
-.component-list {
-  display: flex;
-  flex-direction: column;
+/* Component table */
+.component-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  table-layout: fixed;
 }
-.component-row {
-  display: flex;
-  gap: 1rem;
-  padding: 0.6rem 0.25rem;
+.component-table th,
+.component-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
   border-bottom: 1px solid var(--border);
-  color: var(--text);
-  align-items: baseline;
+  vertical-align: top;
 }
-.component-row:hover {
+.component-table th {
+  font-weight: 600;
   background: var(--bg-secondary);
 }
-.component-name {
-  min-width: 200px;
-  flex-shrink: 0;
+.component-table th:nth-child(1) { width: 22%; }
+.component-table th:nth-child(3) { width: 50px; }
+.component-table-name {
+  font-weight: 600;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
-.component-name strong {
-  color: var(--accent);
-}
-.component-desc {
-  flex: 1;
-  min-width: 0;
+.component-table-desc {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 /* Component header */
@@ -393,4 +396,62 @@ h1 {
 .ref-text {
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+/* API URL box */
+.api-url-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+.api-url-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+.api-url-row + .api-url-row {
+  border-top: 1px solid var(--border);
+}
+.api-url-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 5rem;
+}
+.api-url-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.api-url-jump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+.api-url-jump:hover {
+  text-decoration: none;
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
