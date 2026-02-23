@@ -249,9 +249,14 @@ h1 {
   font-size: 0.9rem;
   color: var(--text);
 }
+.api-callout p {
+  margin-bottom: 0.5rem;
+}
+.api-callout p:last-child {
+  margin-bottom: 0;
+}
 .api-callout strong {
   color: var(--accent);
-  margin-right: 0.5rem;
 }
 .api-callout code {
   font-size: 0.85rem;

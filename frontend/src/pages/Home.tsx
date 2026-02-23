@@ -25,14 +25,23 @@ export function Home() {
       <p className="subtitle">Browse schema namespaces in this registry.</p>
 
       <div className="api-callout">
-        <strong>API</strong> This registry serves a static{' '}
-        <a href="https://ga4gh.github.io/schema-registry/" target="_blank" rel="noopener noreferrer">
-          Schema Registry API
-        </a>{' '}
-        at{' '}
-        <a href={`${API_BASE}/namespaces/index.json`} target="_blank" rel="noopener noreferrer">
-          <code>{apiRoot}/</code>
-        </a>
+        <p>
+          This site is a browsable frontend for a{' '}
+          <a href="https://ga4gh.github.io/schema-registry/" target="_blank" rel="noopener noreferrer">
+            GA4GH Schema Registry
+          </a>{' '}
+          API. The API ingests JSON Schemas from GKS GitHub repositories
+          (vrs, gks-core, cat-vrs, va-spec), bundles them into compound
+          schema documents, and serves them as static JSON matching the
+          Schema Registry specification. Everything you see here is
+          rendered from that API.
+        </p>
+        <p className="api-callout-url">
+          <strong>API endpoint:</strong>{' '}
+          <a href={`${API_BASE}/namespaces/index.json`} target="_blank" rel="noopener noreferrer">
+            <code>{apiRoot}/</code>
+          </a>
+        </p>
       </div>
 
       <div className="card-grid">

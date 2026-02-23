@@ -1,7 +1,7 @@
 name: Build and Deploy
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
   schedule:
     - cron: '0 6 * * 1'
@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Install Python deps
-        run: pip install pyyaml requests
+        run: pip install pyyaml linkml
 
       - name: Build API
         run: python build.py
@@ -30,7 +30,9 @@ jobs:
         run: |
           cd frontend
           npm ci
-          npm run build
+          VITE_BASE_URL=/schema-registry-site/ npm run build
+        env:
+          VITE_BASE_URL: /schema-registry-site/
 
       - name: Assemble site
         run: |
