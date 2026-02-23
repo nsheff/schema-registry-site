@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.BASE_URL + 'api';
+export const API_BASE = import.meta.env.BASE_URL + 'api';
 
 async function fetchJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}/${path}`);

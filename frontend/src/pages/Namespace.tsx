@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getSchemas, type SchemaRecord } from '../api';
+import { getSchemas, API_BASE, type SchemaRecord } from '../api';
 import { MaturityBadge } from '../components/Badge';
 
 export function Namespace() {
@@ -13,10 +13,20 @@ export function Namespace() {
     }
   }, [namespace]);
 
+  const schemasApiUrl = `${API_BASE}/schemas/${namespace}/index.json`;
+
   return (
     <div>
       <h1>{namespace}</h1>
       <p className="subtitle">Schemas in this namespace.</p>
+
+      <div className="api-links">
+        <span className="api-links-label">API:</span>
+        <a href={schemasApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
+          Schemas JSON
+        </a>
+      </div>
+
       <div className="card-grid">
         {schemas.map((s) => (
           <Link

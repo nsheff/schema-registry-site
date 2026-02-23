@@ -239,6 +239,73 @@ h1 {
   border-color: var(--accent);
 }
 
+/* API callout */
+.api-callout {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.api-callout strong {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+.api-callout code {
+  font-size: 0.85rem;
+  background: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* API links row */
+.api-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.api-links-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.api-link-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--bg);
+  transition: background 0.15s, border-color 0.15s;
+}
+.api-link-pill:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.api-link-small {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-left: auto;
+}
+.api-link-small:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
 /* Component list */
 .component-list {
   display: flex;
@@ -247,18 +314,24 @@ h1 {
 .component-row {
   display: flex;
   gap: 1rem;
-  padding: 0.6rem 0;
+  padding: 0.6rem 0.25rem;
   border-bottom: 1px solid var(--border);
   color: var(--text);
   align-items: baseline;
 }
 .component-row:hover {
   background: var(--bg-secondary);
-  text-decoration: none;
 }
-.component-row strong {
+.component-name {
   min-width: 200px;
+  flex-shrink: 0;
+}
+.component-name strong {
   color: var(--accent);
+}
+.component-desc {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Component header */

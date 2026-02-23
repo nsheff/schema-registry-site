@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getComponent } from '../api';
+import { getComponent, API_BASE } from '../api';
 import { SchemaViewer } from '../components/SchemaViewer';
 import { MaturityBadge } from '../components/Badge';
 import { RefLink } from '../components/RefLink';
@@ -75,6 +75,7 @@ export function Component() {
 
   const properties = extractProperties(data);
   const maturity = data.maturity as string | undefined;
+  const componentApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${component}.json`;
 
   return (
     <div>
@@ -85,6 +86,13 @@ export function Component() {
 
       {data.$id ? <p className="schema-id"><code>{String(data.$id)}</code></p> : null}
       {data.description ? <p>{String(data.description)}</p> : null}
+
+      <div className="api-links">
+        <span className="api-links-label">API:</span>
+        <a href={componentApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
+          Component JSON
+        </a>
+      </div>
 
       <div className="tab-bar">
         <button

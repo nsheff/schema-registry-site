@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getVersions, type SchemaVersion } from '../api';
+import { getVersions, API_BASE, type SchemaVersion } from '../api';
 import { StatusBadge } from '../components/Badge';
 
 export function Schema() {
@@ -13,10 +13,20 @@ export function Schema() {
     }
   }, [namespace, schema]);
 
+  const versionsApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/index.json`;
+
   return (
     <div>
       <h1>{schema}</h1>
       <p className="subtitle">Available versions.</p>
+
+      <div className="api-links">
+        <span className="api-links-label">API:</span>
+        <a href={versionsApiUrl} target="_blank" rel="noopener noreferrer" className="api-link-pill">
+          Versions JSON
+        </a>
+      </div>
+
       <table className="data-table">
         <thead>
           <tr>
