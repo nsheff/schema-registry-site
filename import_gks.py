@@ -75,6 +75,15 @@ SCHEMAS = [
         "maintainers": ["GKS Work Stream"],
         "maturity_level": "trial_use",
     },
+    {
+        "name": "seqcol",
+        "repo": "ga4gh/refget",
+        "branch": "master",
+        "schema_path": "docs/schemas",
+        "versions": [{"tag": "1.0.0", "status": "current"}],
+        "maintainers": ["Refget Work Stream"],
+        "maturity_level": "draft",
+    },
 ]
 
 
@@ -95,6 +104,18 @@ def fetch_github_tarball(repo, tag, dest_dir):
     return os.path.join(dest_dir, entries[0])
 
 
+def clone_repo(repo, branch, dest_dir):
+    """Shallow-clone a GitHub repo at a specific branch."""
+    url = f"https://github.com/{repo}.git"
+    print(f"  Cloning {url} @ {branch}")
+    subprocess.run(
+        ["git", "clone", "--depth", "1", "--branch", branch, url, dest_dir],
+        check=True,
+        capture_output=True,
+    )
+    return dest_dir
+
+
 def load_components_from_dir(schema_dir):
     """Load all JSON Schema component files from a directory."""
     components = {}
@@ -104,11 +125,18 @@ def load_components_from_dir(schema_dir):
 
     for entry in sorted(os.listdir(schema_dir)):
         filepath = os.path.join(schema_dir, entry)
-        if not os.path.isfile(filepath) or entry.startswith("."):
+        if not os.path.isfile(filepath) or entry.startswith(".") or entry.endswith(".md"):
             continue
         with open(filepath) as f:
+            raw = f.read()
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            # Retry after stripping trailing commas (common JSON5-ism)
+            import re
+            cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
             try:
-                data = json.load(f)
+                data = json.loads(cleaned)
             except json.JSONDecodeError:
                 print(f"  WARNING: Could not parse {filepath}")
                 continue
@@ -139,7 +167,10 @@ def build_gks(api_dir=API_DIR):
                 print(f"\nBuilding {schema_name} @ {tag}")
 
                 version_tmp = tempfile.mkdtemp(dir=tmp_dir)
-                repo_dir = fetch_github_tarball(schema_cfg["repo"], tag, version_tmp)
+                if "branch" in schema_cfg:
+                    repo_dir = clone_repo(schema_cfg["repo"], schema_cfg["branch"], version_tmp)
+                else:
+                    repo_dir = fetch_github_tarball(schema_cfg["repo"], tag, version_tmp)
 
                 # Load components
                 components = {}
