@@ -143,18 +143,11 @@ def load_components_from_dir(schema_dir):
 
     for entry in sorted(os.listdir(schema_dir)):
         filepath = os.path.join(schema_dir, entry)
-        if not os.path.isfile(filepath) or entry.startswith(".") or entry.endswith(".md"):
+        if not os.path.isfile(filepath) or entry.startswith("."):
             continue
         with open(filepath) as f:
-            raw = f.read()
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError:
-            # Retry after stripping trailing commas (common JSON5-ism)
-            import re
-            cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
             try:
-                data = json.loads(cleaned)
+                data = json.load(f)
             except json.JSONDecodeError:
                 print(f"  WARNING: Could not parse {filepath}")
                 continue
@@ -210,42 +203,52 @@ def build_gks(api_dir=API_DIR):
                     version_tmp = tempfile.mkdtemp(dir=tmp_dir)
                     repo_dir = fetch_github_tarball(schema_cfg["repo"], tag, version_tmp)
 
-                # Load components
-                components = {}
                 if "schema_file" in schema_cfg:
-                    components = load_single_schema_file(os.path.join(repo_dir, schema_cfg["schema_file"]))
-                elif "schema_paths" in schema_cfg:
-                    for sp in schema_cfg["schema_paths"]:
-                        components.update(load_components_from_dir(os.path.join(repo_dir, sp)))
+                    # Single-file schema: write it directly as the bundle, no components
+                    schema_data = load_single_schema_file(os.path.join(repo_dir, schema_cfg["schema_file"]))
+                    schema_content = list(schema_data.values())[0]
+                    bundle_id = schema_content.get("$id", f"https://w3id.org/ga4gh/schema/{schema_name}/{tag}")
+                    bundle = {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": bundle_id,
+                        **schema_content,
+                    }
+                    ver_dir = os.path.join(api_dir, "schemas", NAMESPACE, schema_name, "versions", tag)
+                    write_json(os.path.join(ver_dir, "index.json"), bundle)
                 else:
-                    components = load_components_from_dir(os.path.join(repo_dir, schema_cfg["schema_path"]))
+                    # Multi-component schema: load components and build bundle
+                    components = {}
+                    if "schema_paths" in schema_cfg:
+                        for sp in schema_cfg["schema_paths"]:
+                            components.update(load_components_from_dir(os.path.join(repo_dir, sp)))
+                    else:
+                        components = load_components_from_dir(os.path.join(repo_dir, schema_cfg["schema_path"]))
 
-                if not components:
-                    print(f"  WARNING: No components found for {schema_name} @ {tag}")
-                    continue
+                    if not components:
+                        print(f"  WARNING: No components found for {schema_name} @ {tag}")
+                        continue
 
-                print(f"  Found {len(components)} components")
+                    print(f"  Found {len(components)} components")
 
-                # Get bundle $id from source YAML
-                source_yaml_id = None
-                source_path = os.path.join(repo_dir, schema_cfg.get("source_yaml", ""))
-                if os.path.isfile(source_path):
-                    with open(source_path) as f:
-                        source_yaml_id = yaml.safe_load(f).get("$id")
+                    # Get bundle $id from source YAML
+                    source_yaml_id = None
+                    source_path = os.path.join(repo_dir, schema_cfg.get("source_yaml", ""))
+                    if os.path.isfile(source_path):
+                        with open(source_path) as f:
+                            source_yaml_id = yaml.safe_load(f).get("$id")
 
-                # Build bundle
-                if source_yaml_id:
-                    bundle_id = source_yaml_id.rsplit("/", 1)[0]
-                else:
-                    bundle_id = f"https://w3id.org/ga4gh/schema/{schema_name}/{tag}"
+                    if source_yaml_id:
+                        bundle_id = source_yaml_id.rsplit("/", 1)[0]
+                    else:
+                        bundle_id = f"https://w3id.org/ga4gh/schema/{schema_name}/{tag}"
 
-                bundle = {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "$id": bundle_id,
-                    "$defs": {n: c for n, c in sorted(components.items())},
-                }
+                    bundle = {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "$id": bundle_id,
+                        "$defs": {n: c for n, c in sorted(components.items())},
+                    }
 
-                write_schema_version(NAMESPACE, schema_name, tag, components, bundle, api_dir)
+                    write_schema_version(NAMESPACE, schema_name, tag, components, bundle, api_dir)
 
                 version_records.append({
                     "schema_name": schema_name,
