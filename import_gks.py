@@ -76,10 +76,28 @@ SCHEMAS = [
         "maturity_level": "trial_use",
     },
     {
-        "name": "seqcol",
+        "name": "seqcol-minimal",
         "repo": "ga4gh/refget",
         "branch": "master",
-        "schema_path": "docs/schemas",
+        "schema_file": "docs/schemas/seqcol_minimal_v1.0.0.json",
+        "versions": [{"tag": "1.0.0", "status": "current"}],
+        "maintainers": ["Refget Work Stream"],
+        "maturity_level": "draft",
+    },
+    {
+        "name": "seqcol-extended",
+        "repo": "ga4gh/refget",
+        "branch": "master",
+        "schema_file": "docs/schemas/seqcol_extended_v1.0.0.json",
+        "versions": [{"tag": "1.0.0", "status": "current"}],
+        "maintainers": ["Refget Work Stream"],
+        "maturity_level": "draft",
+    },
+    {
+        "name": "seqcol-refs",
+        "repo": "ga4gh/refget",
+        "branch": "master",
+        "schema_file": "docs/schemas/seqcol_refs_v1.0.0.json",
         "versions": [{"tag": "1.0.0", "status": "current"}],
         "maintainers": ["Refget Work Stream"],
         "maturity_level": "draft",
@@ -146,10 +164,26 @@ def load_components_from_dir(schema_dir):
     return components
 
 
+def load_single_schema_file(filepath):
+    """Load a single JSON Schema file. Returns it as the sole component keyed by filename."""
+    with open(filepath) as f:
+        raw = f.read()
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        import re
+        cleaned = re.sub(r',\s*([}\]])', r'\1', raw)
+        data = json.loads(cleaned)
+    name = data.get("title", os.path.basename(filepath).replace(".json", ""))
+    return {name: data}
+
+
 def build_gks(api_dir=API_DIR):
     """Build API files for all GKS schemas. Returns list of SchemaRecord dicts."""
     tmp_dir = tempfile.mkdtemp(prefix="gks-build-")
     schema_records = []
+
+    clone_cache = {}  # Cache cloned repos by "repo@branch" to avoid re-cloning
 
     try:
         for schema_cfg in SCHEMAS:
@@ -166,15 +200,21 @@ def build_gks(api_dir=API_DIR):
                 tag = version_cfg["tag"]
                 print(f"\nBuilding {schema_name} @ {tag}")
 
-                version_tmp = tempfile.mkdtemp(dir=tmp_dir)
                 if "branch" in schema_cfg:
-                    repo_dir = clone_repo(schema_cfg["repo"], schema_cfg["branch"], version_tmp)
+                    cache_key = f"{schema_cfg['repo']}@{schema_cfg['branch']}"
+                    if cache_key not in clone_cache:
+                        version_tmp = tempfile.mkdtemp(dir=tmp_dir)
+                        clone_cache[cache_key] = clone_repo(schema_cfg["repo"], schema_cfg["branch"], version_tmp)
+                    repo_dir = clone_cache[cache_key]
                 else:
+                    version_tmp = tempfile.mkdtemp(dir=tmp_dir)
                     repo_dir = fetch_github_tarball(schema_cfg["repo"], tag, version_tmp)
 
                 # Load components
                 components = {}
-                if "schema_paths" in schema_cfg:
+                if "schema_file" in schema_cfg:
+                    components = load_single_schema_file(os.path.join(repo_dir, schema_cfg["schema_file"]))
+                elif "schema_paths" in schema_cfg:
                     for sp in schema_cfg["schema_paths"]:
                         components.update(load_components_from_dir(os.path.join(repo_dir, sp)))
                 else:
