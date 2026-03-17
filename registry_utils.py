@@ -40,7 +40,7 @@ def write_schema_version(namespace, schema_name, tag, components, bundle, api_di
     comp_dir = os.path.join(ver_dir, "components")
     component_records = []
     for name, component in sorted(components.items()):
-        write_json(os.path.join(comp_dir, f"{name}.json"), component)
+        write_json(os.path.join(comp_dir, name, "index.json"), component)
         component_records.append(extract_component_record(name, component))
 
     # Components list

@@ -14,7 +14,7 @@ export function Namespace() {
     }
   }, [namespace]);
 
-  const schemasApiUrl = `${API_BASE}/schemas/${namespace}/index.json`;
+  const schemasApiUrl = `${API_BASE}/schemas/${namespace}/`;
 
   return (
     <div>

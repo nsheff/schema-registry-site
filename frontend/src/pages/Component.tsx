@@ -76,7 +76,7 @@ export function Component() {
 
   const properties = extractProperties(data);
   const maturity = data.maturity as string | undefined;
-  const componentApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${component}.json`;
+  const componentApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${component}/`;
 
   return (
     <div>

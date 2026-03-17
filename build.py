@@ -43,7 +43,7 @@ def build_all():
 
     # Write service-info (GA4GH Service Info 1.0)
     write_json(
-        os.path.join(API_DIR, "service-info"),
+        os.path.join(API_DIR, "service-info", "index.json"),
         {
             "id": "org.ga4gh.schema-registry.nsheff",
             "name": "GKS Schema Registry",

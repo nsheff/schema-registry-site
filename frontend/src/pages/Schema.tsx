@@ -14,7 +14,7 @@ export function Schema() {
     }
   }, [namespace, schema]);
 
-  const versionsApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/index.json`;
+  const versionsApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/`;
 
   return (
     <div>
