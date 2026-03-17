@@ -49,25 +49,25 @@ export interface ComponentRecord {
 }
 
 export function getNamespaces() {
-  return fetchJSON<PagedResponse<Namespace>>('namespaces/');
+  return fetchJSON<PagedResponse<Namespace>>('namespaces');
 }
 
 export function getSchemas(ns: string) {
-  return fetchJSON<PagedResponse<SchemaRecord>>(`schemas/${ns}/`);
+  return fetchJSON<PagedResponse<SchemaRecord>>(`schemas/${ns}`);
 }
 
 export function getVersions(ns: string, schema: string) {
-  return fetchJSON<PagedResponse<SchemaVersion>>(`schemas/${ns}/${schema}/versions/`);
+  return fetchJSON<PagedResponse<SchemaVersion>>(`schemas/${ns}/${schema}/versions`);
 }
 
 export function getSchema(ns: string, schema: string, version: string) {
-  return fetchJSON<Record<string, unknown>>(`schemas/${ns}/${schema}/versions/${version}/`);
+  return fetchJSON<Record<string, unknown>>(`schemas/${ns}/${schema}/versions/${version}`);
 }
 
 export function getComponents(ns: string, schema: string, version: string) {
-  return fetchJSON<PagedResponse<ComponentRecord>>(`schemas/${ns}/${schema}/versions/${version}/components/`);
+  return fetchJSON<PagedResponse<ComponentRecord>>(`schemas/${ns}/${schema}/versions/${version}/components`);
 }
 
 export function getComponent(ns: string, schema: string, version: string, component: string) {
-  return fetchJSON<Record<string, unknown>>(`schemas/${ns}/${schema}/versions/${version}/components/${component}/`);
+  return fetchJSON<Record<string, unknown>>(`schemas/${ns}/${schema}/versions/${version}/components/${component}`);
 }

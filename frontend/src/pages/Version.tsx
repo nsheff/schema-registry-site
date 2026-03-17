@@ -28,8 +28,8 @@ export function Version() {
       c.description.toLowerCase().includes(filter.toLowerCase())
   );
 
-  const bundleApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/`;
-  const componentsApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/`;
+  const bundleApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}`;
+  const componentsApiUrl = `${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components`;
 
   return (
     <div>
@@ -85,7 +85,7 @@ export function Version() {
                   <td className="component-table-desc">{c.description}</td>
                   <td>
                     <a
-                      href={`${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${c.component_name}/`}
+                      href={`${API_BASE}/schemas/${namespace}/${schema}/versions/${version}/components/${c.component_name}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="api-link-small"
