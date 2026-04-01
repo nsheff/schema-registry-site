@@ -455,3 +455,85 @@ h1 {
   color: white;
   border-color: var(--accent);
 }
+
+/* LinkML-specific styles */
+.linkml-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.linkml-section {
+  margin-bottom: 2rem;
+}
+
+.linkml-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.linkml-type {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.linkml-type-class {
+  color: #2563eb;
+}
+.linkml-type-class:hover {
+  text-decoration: underline;
+}
+
+.linkml-type-enum {
+  color: #7c3aed;
+}
+.linkml-type-enum:hover {
+  text-decoration: underline;
+}
+
+.linkml-type-primitive {
+  color: var(--text-muted);
+}
+
+.linkml-multivalued {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.linkml-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.linkml-chip {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.linkml-chip:hover {
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.linkml-chip-class {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.linkml-chip-enum {
+  background: #ede9fe;
+  color: #7c3aed;
+}

@@ -5,6 +5,8 @@ import { Namespace } from './pages/Namespace';
 import { Schema } from './pages/Schema';
 import { Version } from './pages/Version';
 import { Component } from './pages/Component';
+import { ClassDetail } from './pages/ClassDetail';
+import { EnumDetail } from './pages/EnumDetail';
 
 const router = createBrowserRouter(
   [
@@ -42,6 +44,26 @@ const router = createBrowserRouter(
             crumb: (p: Record<string, string>) => ({
               label: `${p.schema}@${p.version}`,
               to: `/${p.namespace}/${p.schema}/${p.version}`,
+            }),
+          },
+        },
+        {
+          path: '/:namespace/:schema/:version/class/:className',
+          element: <ClassDetail />,
+          handle: {
+            crumb: (p: Record<string, string>) => ({
+              label: p.className,
+              to: `/${p.namespace}/${p.schema}/${p.version}/class/${p.className}`,
+            }),
+          },
+        },
+        {
+          path: '/:namespace/:schema/:version/enum/:enumName',
+          element: <EnumDetail />,
+          handle: {
+            crumb: (p: Record<string, string>) => ({
+              label: p.enumName,
+              to: `/${p.namespace}/${p.schema}/${p.version}/enum/${p.enumName}`,
             }),
           },
         },

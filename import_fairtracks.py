@@ -19,6 +19,7 @@ from registry_utils import (
     write_versions_list,
     write_latest_alias,
 )
+from import_linkml import build_linkml_metadata
 
 API_DIR = "api"
 
@@ -102,17 +103,26 @@ def build_fairtracks(api_dir=API_DIR):
                 tag = version_cfg["tag"]
                 print(f"\nBuilding {schema_name} @ {tag}")
 
-                components, bundle = linkml_to_components(linkml_path)
-
-                if not components:
-                    print(f"  WARNING: No components found for {schema_name} @ {tag}")
-                    continue
+                # Try JSON Schema conversion (requires gen-json-schema)
+                try:
+                    components, bundle = linkml_to_components(linkml_path)
+                except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                    print(f"  WARNING: gen-json-schema failed ({e}), generating empty JSON Schema bundle")
+                    components = {}
+                    bundle = {"$defs": {}}
 
                 # Set a proper $id on the bundle
                 bundle_id = f"https://w3id.org/fairtracks/schema/{schema_name}/{tag}"
                 bundle["$id"] = bundle_id
 
                 write_schema_version(NAMESPACE, schema_name, tag, components, bundle, api_dir)
+
+                # Generate LinkML metadata alongside JSON Schema
+                schema_dir = os.path.dirname(linkml_path)
+                linkml_output = os.path.join(
+                    api_dir, "schemas", NAMESPACE, schema_name, "versions", tag
+                )
+                build_linkml_metadata(schema_dir, linkml_output)
 
                 version_records.append({
                     "schema_name": schema_name,

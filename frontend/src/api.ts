@@ -71,3 +71,75 @@ export function getComponents(ns: string, schema: string, version: string) {
 export function getComponent(ns: string, schema: string, version: string, component: string) {
   return fetchJSON<Record<string, unknown>>(`schemas/${ns}/${schema}/versions/${version}/components/${component}`);
 }
+
+// LinkML metadata types and functions
+
+export interface LinkMLInfo {
+  has_linkml: boolean;
+  class_count: number;
+  enum_count: number;
+}
+
+export interface LinkMLClassSummary {
+  name: string;
+  description: string;
+  source_file: string;
+  property_count: number;
+  is_a?: string;
+}
+
+export interface LinkMLProperty {
+  name: string;
+  description: string;
+  range: string;
+  range_type: 'class' | 'enum' | 'type';
+  required?: boolean;
+  multivalued?: boolean;
+  identifier?: boolean;
+}
+
+export interface LinkMLClassRecord {
+  name: string;
+  description: string;
+  source_file: string;
+  is_a?: string;
+  mixins?: string[];
+  properties: LinkMLProperty[];
+  references: string[];
+  referenced_by?: string[];
+  rules?: unknown[];
+}
+
+export interface LinkMLEnumSummary {
+  name: string;
+  description: string;
+  source_file: string;
+  value_count: number;
+}
+
+export interface LinkMLEnumRecord {
+  name: string;
+  description: string;
+  source_file: string;
+  values: { name: string; description: string; meaning?: string }[];
+}
+
+export function getLinkMLInfo(ns: string, schema: string, version: string) {
+  return fetchJSON<LinkMLInfo>(`schemas/${ns}/${schema}/versions/${version}/linkml.json`);
+}
+
+export function getLinkMLClasses(ns: string, schema: string, version: string) {
+  return fetchJSON<LinkMLClassSummary[]>(`schemas/${ns}/${schema}/versions/${version}/classes/index.json`);
+}
+
+export function getLinkMLClass(ns: string, schema: string, version: string, className: string) {
+  return fetchJSON<LinkMLClassRecord>(`schemas/${ns}/${schema}/versions/${version}/classes/${className}.json`);
+}
+
+export function getLinkMLEnums(ns: string, schema: string, version: string) {
+  return fetchJSON<LinkMLEnumSummary[]>(`schemas/${ns}/${schema}/versions/${version}/enums/index.json`);
+}
+
+export function getLinkMLEnum(ns: string, schema: string, version: string, enumName: string) {
+  return fetchJSON<LinkMLEnumRecord>(`schemas/${ns}/${schema}/versions/${version}/enums/${enumName}.json`);
+}
