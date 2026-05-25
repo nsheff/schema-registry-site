@@ -90,7 +90,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === '/compliance') {
+    if (url.pathname === '/compliance' && url.searchParams.has('target')) {
       return handleCompliance(request);
     }
 

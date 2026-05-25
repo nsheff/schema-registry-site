@@ -6,7 +6,7 @@ const WORKER_BASE = typeof window !== 'undefined' && window.location.hostname.en
   ? ''
   : WORKER_URL;
 
-const DEFAULT_TARGET = `${WORKER_URL}/api`;
+const DEFAULT_TARGET = 'https://nsheff.github.io/schema-registry-site/api';
 
 interface ResultEvent {
   name: string;
