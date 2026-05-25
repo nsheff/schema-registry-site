@@ -30,7 +30,7 @@ SCHEMAS = [
     {
         "name": "fga",
         "repo": "fairtracks/fga-wg",
-        "branch": "sveinugu-link-ml-schema",
+        "branch": "main",
         "schema_path": "src/schema/top_level.yaml",
         "versions": [{"tag": "0.1.0", "status": "current"}],
         "maintainers": ["FAIRtracks"],
