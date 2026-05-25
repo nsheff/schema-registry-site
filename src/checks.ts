@@ -45,22 +45,34 @@ export function resetFetchCache(): void {
   fetchCache = new Map();
 }
 
-async function cachedFetch(url: string): Promise<CachedResponse> {
-  let pending = fetchCache.get(url);
-  if (!pending) {
-    pending = (async () => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        const body = await res.text();
-        return { status: res.status, body, headers: res.headers };
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    })();
-    fetchCache.set(url, pending);
+// Append trailing slash for directory-style paths so static hosts that index
+// JSON via /index.json (e.g. GitHub Pages) don't 301-redirect and double the
+// subrequest count.
+function normalize(url: string): string {
+  const u = new URL(url);
+  if (!u.pathname.endsWith('/') && !/\.(json|yaml|yml|xml|html|txt)$/i.test(u.pathname)) {
+    u.pathname += '/';
   }
+  return u.toString();
+}
+
+async function cachedFetch(url: string): Promise<CachedResponse> {
+  url = normalize(url);
+  const cached = fetchCache.get(url);
+  if (cached) return cached;
+
+  const pending = (async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      const body = await res.text();
+      return { status: res.status, body, headers: res.headers };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  })();
+  fetchCache.set(url, pending);
   return pending;
 }
 
