@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
 
-const WORKER_BASE = '';
+const WORKER_URL = 'https://schema-registry-site.nsheff.workers.dev';
 
-const DEFAULT_TARGET = typeof window !== 'undefined'
-  ? `${window.location.origin}/api`
-  : '';
+const WORKER_BASE = typeof window !== 'undefined' && window.location.hostname.endsWith('.workers.dev')
+  ? ''
+  : WORKER_URL;
+
+const DEFAULT_TARGET = `${WORKER_URL}/api`;
 
 interface ResultEvent {
   name: string;
