@@ -21,6 +21,9 @@ export function Layout() {
           <Link to="/" className="nav-title">
             GA4GH Schema Registry
           </Link>
+          <Link to="/compliance" className="nav-link">
+            Compliance
+          </Link>
           <a
             href="https://ga4gh.github.io/schema-registry/"
             target="_blank"

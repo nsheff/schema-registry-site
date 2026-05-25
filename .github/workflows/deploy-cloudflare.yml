@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 on:
   push:
     branches: [main, master]
@@ -31,9 +31,12 @@ jobs:
       - name: Assemble site
         run: cp -r api/ frontend/dist/api/
 
-      - name: Deploy to Cloudflare Pages
+      - name: Install Worker deps
+        run: npm install
+
+      - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy frontend/dist --project-name=schema-registry-site
+          command: deploy

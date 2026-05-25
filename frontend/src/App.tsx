@@ -7,6 +7,7 @@ import { Version } from './pages/Version';
 import { Component } from './pages/Component';
 import { ClassDetail } from './pages/ClassDetail';
 import { EnumDetail } from './pages/EnumDetail';
+import { Compliance } from './pages/Compliance';
 
 const router = createBrowserRouter(
   [
@@ -16,6 +17,10 @@ const router = createBrowserRouter(
         {
           path: '/',
           element: <Home />,
+        },
+        {
+          path: '/compliance',
+          element: <Compliance />,
         },
         {
           path: '/:namespace',
