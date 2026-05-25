@@ -7,16 +7,11 @@ const MAX_VERSIONS_PER_SCHEMA = 3;
 const COMPLIANCE_TIMEOUT = 5000;
 
 async function fetchJson<T>(url: string): Promise<T | null> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
   try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (res.status !== 200) return null;
-    return await res.json() as T;
+    const res = await checks.cachedFetchJson<T>(url);
+    return res.status === 200 ? res.data : null;
   } catch {
     return null;
-  } finally {
-    clearTimeout(timeoutId);
   }
 }
 
@@ -92,6 +87,7 @@ export async function buildChecks(apiRoot: string): Promise<Check[]> {
   const namespaces = nsData.results.slice(0, MAX_NAMESPACES);
   let firstNs: string | null = null;
   let firstSchema: string | null = null;
+  let firstLatest: string | null = null;
 
   for (const nsRecord of namespaces) {
     const ns = nsRecord.namespace_name;
@@ -113,19 +109,7 @@ export async function buildChecks(apiRoot: string): Promise<Check[]> {
       run: () => checks.checkSchemaRecordFields(apiRoot, ns),
     });
 
-    checkList.push({
-      name: `unknown_schema_404[${tag}]`,
-      description: 'GET /schemas/{ns}/__missing__/versions returns 404.',
-      recommended: false,
-      run: () => checks.checkUnknownSchema404(apiRoot, ns),
-    });
 
-    checkList.push({
-      name: `filter_unknown_returns_empty[${tag}]`,
-      description: '?schema_name=__missing__ returns 200 with empty results (not 404).',
-      recommended: true,
-      run: () => checks.checkFilterUnknownReturnsEmpty(apiRoot, ns),
-    });
 
     const schemasData = await fetchJson<PagedResponse<SchemaRecord>>(`${apiRoot}/schemas/${ns}`);
     if (!schemasData) continue;
@@ -137,6 +121,7 @@ export async function buildChecks(apiRoot: string): Promise<Check[]> {
 
       if (firstSchema === null && firstNs === ns) {
         firstSchema = schemaName;
+        firstLatest = schemaRecord.latest_released_version ?? null;
 
         checkList.push({
           name: `filter_schema_name[${ns}/${schemaName}]`,
@@ -196,23 +181,6 @@ export async function buildChecks(apiRoot: string): Promise<Check[]> {
         run: () => checks.checkLatestMatchesListed(apiRoot, ns, schemaName),
       });
 
-      checkList.push({
-        name: `unknown_version_404[${stag}]`,
-        description: 'GET /schemas/{ns}/{schema}/versions/9999.9.9 returns 404.',
-        recommended: false,
-        run: () => checks.checkUnknownVersion404(apiRoot, ns, schemaName),
-      });
-
-      const latest = schemaRecord.latest_released_version;
-      if (latest) {
-        checkList.push({
-          name: `latest_alias[${stag}]`,
-          description: 'GET /schemas/{ns}/{schema}/versions/latest body equals the latest_released_version document.',
-          recommended: false,
-          run: () => checks.checkLatestAlias(apiRoot, ns, schemaName, latest),
-        });
-      }
-
       const versionsData = await fetchJson<PagedResponse<VersionRecord>>(
         `${apiRoot}/schemas/${ns}/${schemaName}/versions`
       );
@@ -248,10 +216,44 @@ export async function buildChecks(apiRoot: string): Promise<Check[]> {
     }
   }
 
+  // API-contract checks: run once against the first ns/schema/version we found.
+  // These verify uniform server behavior, so per-item duplication is wasteful.
+  if (firstNs) {
+    checkList.push({
+      name: 'unknown_schema_404',
+      description: 'GET /schemas/{ns}/__missing__/versions returns 404.',
+      recommended: false,
+      run: () => checks.checkUnknownSchema404(apiRoot, firstNs),
+    });
+    checkList.push({
+      name: 'filter_unknown_returns_empty',
+      description: '?schema_name=__missing__ returns 200 with empty results (not 404).',
+      recommended: true,
+      run: () => checks.checkFilterUnknownReturnsEmpty(apiRoot, firstNs),
+    });
+  }
+  if (firstNs && firstSchema) {
+    checkList.push({
+      name: 'unknown_version_404',
+      description: 'GET /schemas/{ns}/{schema}/versions/9999.9.9 returns 404.',
+      recommended: false,
+      run: () => checks.checkUnknownVersion404(apiRoot, firstNs, firstSchema),
+    });
+  }
+  if (firstNs && firstSchema && firstLatest) {
+    checkList.push({
+      name: 'latest_alias',
+      description: 'GET /schemas/{ns}/{schema}/versions/latest body equals the latest_released_version document.',
+      recommended: false,
+      run: () => checks.checkLatestAlias(apiRoot, firstNs, firstSchema, firstLatest),
+    });
+  }
+
   return checkList;
 }
 
 export async function* runComplianceStream(apiRoot: string): AsyncGenerator<SSEEvent> {
+  checks.resetFetchCache();
   const checkList = await buildChecks(apiRoot);
 
   yield { type: 'start', total: checkList.length, server_url: apiRoot };

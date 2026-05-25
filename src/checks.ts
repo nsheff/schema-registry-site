@@ -33,27 +33,47 @@ import type { NamespaceRecord, SchemaRecord, VersionRecord, PagedResponse } from
 
 const COMPLIANCE_TIMEOUT = 5000;
 
-async function fetchJson<T>(url: string): Promise<{ status: number; data: T; headers: Headers }> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    const data = await res.json() as T;
-    return { status: res.status, data, headers: res.headers };
-  } finally {
-    clearTimeout(timeoutId);
-  }
+interface CachedResponse {
+  status: number;
+  body: string;
+  headers: Headers;
 }
 
-async function fetchRaw(url: string): Promise<{ status: number; headers: Headers }> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    return { status: res.status, headers: res.headers };
-  } finally {
-    clearTimeout(timeoutId);
+let fetchCache = new Map<string, Promise<CachedResponse>>();
+
+export function resetFetchCache(): void {
+  fetchCache = new Map();
+}
+
+async function cachedFetch(url: string): Promise<CachedResponse> {
+  let pending = fetchCache.get(url);
+  if (!pending) {
+    pending = (async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), COMPLIANCE_TIMEOUT);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        const body = await res.text();
+        return { status: res.status, body, headers: res.headers };
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    })();
+    fetchCache.set(url, pending);
   }
+  return pending;
+}
+
+export async function cachedFetchJson<T>(url: string): Promise<{ status: number; data: T; headers: Headers }> {
+  const res = await cachedFetch(url);
+  return { status: res.status, data: JSON.parse(res.body) as T, headers: res.headers };
+}
+
+const fetchJson = cachedFetchJson;
+
+async function fetchRaw(url: string): Promise<{ status: number; headers: Headers }> {
+  const res = await cachedFetch(url);
+  return { status: res.status, headers: res.headers };
 }
 
 export async function checkServiceInfo(apiRoot: string): Promise<void> {
