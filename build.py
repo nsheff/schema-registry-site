@@ -6,6 +6,7 @@ Runs each importer, then writes the top-level namespaces index and manifest.
 
 import os
 import shutil
+import urllib.request
 
 from registry_utils import make_pagination, write_json
 from import_gks import build_gks
@@ -13,6 +14,7 @@ from import_fairtracks import build_fairtracks
 
 API_DIR = "api"
 SERVER = "https://nsheff.github.io/schema-registry-site"
+SPEC_URL = "https://raw.githubusercontent.com/ga4gh/schema-registry/main/docs/specification.yaml"
 
 
 def build_all():
@@ -61,6 +63,10 @@ def build_all():
             "environment": "production",
         },
     )
+
+    # Fetch the OpenAPI spec from the spec repo
+    print(f"\nFetching OpenAPI spec from {SPEC_URL}")
+    urllib.request.urlretrieve(SPEC_URL, os.path.join(API_DIR, "openapi.yaml"))
 
     # Write manifest
     manifest_paths = []

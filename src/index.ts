@@ -24,8 +24,9 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
 
   const url = new URL(request.url);
   let pathname = url.pathname;
+  const hasFileExtension = /\.[a-z0-9]+$/i.test(pathname);
 
-  if (!pathname.endsWith('.json')) {
+  if (!hasFileExtension) {
     pathname = pathname.endsWith('/') ? `${pathname}index.json` : `${pathname}/index.json`;
   }
 
@@ -38,7 +39,9 @@ async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   const headers = new Headers(response.headers);
-  headers.set('Content-Type', 'application/json');
+  if (!hasFileExtension) {
+    headers.set('Content-Type', 'application/json');
+  }
   for (const [k, v] of Object.entries(CORS_HEADERS)) {
     headers.set(k, v);
   }
